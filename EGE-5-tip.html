@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ЕГЭ Информатика — Тип 5 (Python)</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<!-- CodeMirror: редактор с подсветкой синтаксиса Python -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --primary: #3b82f6; --primary-dark: #2563eb; --success: #22c55e;
+    --warning: #f59e0b; --danger: #ef4444; --dark: #0f172a;
+    --dark-light: #1e293b; --dark-lighter: #334155; --gray: #64748b;
+    --gray-light: #94a3b8; --text: #e2e8f0; --text-dark: #cbd5e1;
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--dark); color: var(--text); line-height: 1.6; min-height: 100vh; padding: 20px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.step { min-height: 80vh; padding: 20px 0; }
+.loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,23,42,0.95); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.spinner { width: 50px; height: 50px; border: 4px solid var(--dark-lighter); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+header { text-align: center; margin: 30px 0; }
+header h1 { color: var(--warning); font-size: 2.2rem; margin-bottom: 10px; }
+header .subtitle { color: var(--gray); font-size: 1.1rem; }
+.auth-card { max-width: 700px; margin: 40px auto; background: var(--dark-light); padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.auth-card h2 { color: var(--warning); text-align: center; margin-bottom: 20px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 6px; color: var(--text-dark); font-size: 0.9rem; font-weight: 500; }
+.form-group input, .form-group select { width: 100%; padding: 12px; background: var(--dark); border: 1px solid var(--dark-lighter); border-radius: 8px; color: var(--text); font-size: 1rem; }
+.form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+.btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary { background: var(--gray); color: white; }
+.btn-success { background: var(--success); color: white; }
+.btn-block { width: 100%; }
+.variants-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin: 20px 0; }
+.variant-btn { padding: 15px; background: var(--dark); border: 2px solid var(--dark-lighter); border-radius: 8px; color: var(--text); font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+.variant-btn:hover { border-color: var(--primary); transform: translateY(-2px); }
+.variant-btn.selected { background: var(--primary); border-color: var(--primary); color: white; }
+.security-notice { background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(245,158,11,0.15)); border: 1px solid var(--danger); border-left: 4px solid var(--danger); padding: 15px 20px; border-radius: 10px; margin: 20px 0; display: flex; align-items: flex-start; gap: 12px; }
+.security-notice .icon { font-size: 1.5rem; }
+.security-notice .title { color: var(--danger); font-weight: bold; margin-bottom: 5px; }
+.security-notice .desc { color: var(--text); font-size: 0.9rem; }
+.security-notice .counter { margin-top: 8px; padding: 5px 10px; background: rgba(0,0,0,0.3); border-radius: 6px; font-size: 0.85rem; color: var(--warning); display: inline-block; }
+.work-header { background: var(--dark-light); padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 100; }
+.work-header h2 { color: var(--warning); font-size: 1.5rem; }
+.work-instruction { background: rgba(59,130,246,0.1); border-left: 4px solid var(--primary); padding: 12px 18px; border-radius: 8px; margin-bottom: 25px; color: var(--text-dark); font-size: 0.95rem; }
+.work-instruction b { color: var(--primary); }
+.tasks-list { display: flex; flex-direction: column; gap: 25px; margin-bottom: 100px; }
+.task-card { background: var(--dark); padding: 25px; border-radius: 12px; border-left: 4px solid var(--gray); transition: opacity 0.3s; }
+.task-card.completed { border-left-color: var(--success); }
+.task-card.wrong { border-left-color: var(--danger); }
+.task-card.replacing { opacity: 0.3; pointer-events: none; }
+.task-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+.task-title { font-size: 1.2rem; color: var(--warning); font-weight: bold; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 500; margin-right: 5px; }
+.badge-level-3 { background: rgba(245,158,11,0.2); color: var(--warning); }
+.badge-level-4 { background: rgba(59,130,246,0.2); color: var(--primary); }
+.badge-level-5 { background: rgba(34,197,94,0.2); color: var(--success); }
+.task-status { padding: 5px 15px; border-radius: 15px; font-size: 0.85rem; font-weight: bold; }
+.status-pending { background: var(--gray); color: white; }
+.status-completed { background: var(--success); color: white; }
+.status-wrong { background: var(--danger); color: white; }
+.task-description { color: var(--text); margin-bottom: 15px; line-height: 1.8; font-size: 1rem; }
+.task-description b { color: var(--warning); }
+
+/* ===== CodeMirror: тёмная тема с подсветкой Python ===== */
+.editor-wrapper { border: 1px solid var(--dark-lighter); border-radius: 8px; overflow: hidden; }
+.editor-wrapper:focus-within { border-color: var(--primary); }
+.CodeMirror { height: 280px; font-family: 'Consolas','Monaco',monospace; font-size: 0.95rem; line-height: 1.6; }
+.cm-s-lms-dark.CodeMirror { background: #020617; color: #e2e8f0; }
+.cm-s-lms-dark .CodeMirror-gutters { background: #0f172a; border-right: 1px solid #334155; }
+.cm-s-lms-dark .CodeMirror-linenumber { color: #475569; }
+.cm-s-lms-dark .CodeMirror-cursor { border-left: 2px solid #3b82f6; }
+.cm-s-lms-dark .CodeMirror-selected { background: rgba(59,130,246,0.3) !important; }
+.cm-s-lms-dark .CodeMirror-activeline-background { background: rgba(59,130,246,0.08); }
+.cm-s-lms-dark .CodeMirror-matchingbracket { color: #fbbf24 !important; font-weight: bold; }
+/* Подсветка синтаксиса Python */
+.cm-s-lms-dark .cm-keyword { color: #c084fc; font-weight: 500; }   /* def, if, for, while, return, import */
+.cm-s-lms-dark .cm-builtin { color: #60a5fa; }                      /* print, len, range, int, bin, sum */
+.cm-s-lms-dark .cm-string { color: #86efac; }                       /* "строки" */
+.cm-s-lms-dark .cm-number { color: #fbbf24; }                       /* числа */
+.cm-s-lms-dark .cm-comment { color: #64748b; font-style: italic; }  /* # комментарии */
+.cm-s-lms-dark .cm-def { color: #f59e0b; font-weight: 500; }        /* имена функций */
+.cm-s-lms-dark .cm-variable { color: #e2e8f0; }                     /* переменные */
+.cm-s-lms-dark .cm-variable-2 { color: #93c5fd; }
+.cm-s-lms-dark .cm-operator { color: #f472b6; }                     /* операторы */
+.cm-s-lms-dark .cm-punctuation { color: #94a3b8; }
+.cm-s-lms-dark .cm-property { color: #5eead4; }
+
+.task-actions { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+.output { margin-top: 15px; background: #020617; padding: 15px; border-radius: 8px; font-family: 'Consolas',monospace; font-size: 0.9rem; white-space: pre-wrap; max-height: 400px; overflow-y: auto; border: 1px solid var(--dark-lighter); }
+.output.success { border-color: var(--success); color: #86efac; }
+.output.error { border-color: var(--danger); color: #fca5a5; }
+.output.info { border-color: var(--primary); color: #93c5fd; }
+.sticky-bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1e293b, #0f172a); border-top: 2px solid var(--primary); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; z-index: 900; }
+.sticky-progress { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+.sticky-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.final-grade { font-size: 5rem; font-weight: bold; margin: 20px 0; }
+.final-grade.grade-2 { color: var(--danger); }
+.final-grade.grade-3 { color: var(--warning); }
+.final-grade.grade-4 { color: var(--primary); }
+.final-grade.grade-5 { color: var(--success); }
+.toast { position: fixed; bottom: 100px; right: 30px; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1100; max-width: 400px; color: white; }
+.toast.success { background: var(--success); }
+.toast.warning { background: var(--warning); color: #1e293b; }
+.toast.info { background: var(--primary); }
+.toast.error { background: var(--danger); }
+.results-table { width: 100%; margin: 20px 0; border-collapse: collapse; }
+.results-table td { padding: 10px; border-bottom: 1px solid var(--dark-lighter); text-align: left; }
+.results-table td:first-child { color: var(--gray-light); font-weight: 500; width: 40%; }
+.results-table td:last-child { color: var(--text); font-weight: bold; }
+@media (max-width: 768px) { .sticky-bottom-bar { flex-direction: column; align-items: stretch; } }
+</style>
+</head>
+<body>
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <p>Загрузка Python интерпретатора...</p>
+    <p style="color: var(--gray); font-size: 0.9rem; margin-top: 10px;">Это может занять несколько секунд</p>
+</div>
+
+<div class="container">
+    <header>
+        <h1>🎓 ЕГЭ Информатика — Тип 5 (Python)</h1>
+        <p class="subtitle">Анализ алгоритмов • Напишите программу для решения</p>
+    </header>
+
+    <div id="step-registration" class="step">
+        <div class="auth-card">
+            <h2>👤 Регистрация ученика</h2>
+            <div class="form-group">
+                <label>Фамилия Имя *</label>
+                <input type="text" id="studentFullName" placeholder="Например: Иванов Иван">
+            </div>
+            <div class="form-group">
+                <label>Класс *</label>
+                <input type="text" id="studentClass" placeholder="Например: 11А">
+            </div>
+            <button class="btn btn-primary btn-block" onclick="registerStudent()">Продолжить →</button>
+        </div>
+    </div>
+
+    <div id="step-select-variant" class="step hidden">
+        <div class="auth-card">
+            <h2>🎯 Выберите вариант</h2>
+            <p style="text-align: center; color: var(--gray); margin-bottom: 15px;">12 вариантов по 3 задачи разной сложности (уровни 3, 4, 5)</p>
+            <div class="variants-grid" id="variantsGrid"></div>
+            <div class="security-notice">
+                <div class="icon">🛡️</div>
+                <div class="content">
+                    <div class="title">Защита от списывания</div>
+                    <div class="desc">При переключении вкладки будет назначен <b>другой вариант</b>. Прогресс сбрасывается.</div>
+                    <div class="counter" id="switchCounter">Замен вариантов: 0</div>
+                </div>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="startWork()" id="startBtn" disabled>Начать работу →</button>
+        </div>
+    </div>
+
+    <div id="step-solving" class="step hidden">
+        <div class="work-header">
+            <h2 id="workTitle">Вариант 1</h2>
+            <div style="display: flex; gap: 15px; font-weight: bold;">
+                <span id="progressText">0 / 3 решено</span>
+                <span id="timerText">⏱ 00:00</span>
+            </div>
+        </div>
+        <div class="work-instruction">
+            💡 <b>Инструкция:</b> напишите программу на Python, которая выводит искомое число через <code style="color:#86efac;">print()</code>.
+            Код форматируется автоматически по PEP8 при переходе к другой задаче. Отступы можно менять вручную клавишами <b>Tab</b> / <b>Shift+Tab</b>.
+        </div>
+        <div id="tasksContainer" class="tasks-list"></div>
+        <div class="sticky-bottom-bar">
+            <div class="sticky-progress">
+                <span id="stickyProgress">0 решено / 3 задач</span>
+                <span>· 🔄 <b id="stickySwitches">0</b></span>
+            </div>
+            <div class="sticky-actions">
+                <button class="btn btn-success" id="sendBtn" onclick="sendToTeacher()">✅ Завершить и отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="step-results" class="step hidden">
+        <div class="auth-card text-center">
+            <h2>🎓 Работа завершена</h2>
+            <div class="final-grade" id="finalGradeDisplay"></div>
+            <table class="results-table" id="resultsSummary"></table>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
+                <button class="btn btn-success" id="sendBtn2" onclick="sendToTeacher()">✅ Завершить и отправить</button>
+                <button class="btn btn-primary" onclick="downloadResults()">📋 Скачать</button>
+                <button class="btn btn-secondary" onclick="location.reload()">🔄 Начать заново</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// ⚠️ URL ИЗ GOOGLE APPS SCRIPT (вставьте свой!)
+// ============================================
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwvLrMHf54MXOuFK-y2CEt0LEoP01RMh-tdfGAhgPdtCvbRNV0sEDs_HAlrrnxze6Atxg/exec';
+const TOPIC = 'ЕГЭ Информатика Тип 5 (Python)';
+
+// ============================================
+// БАНК ЗАДАЧ: 12 вариантов × 3 задачи (уровни 3, 4, 5)
+// Ответы взяты из файла 5.txt
+// ============================================
+const VARIANTS = {
+    1: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. К этой записи дописываются справа ещё <b>два разряда</b> по правилу:<br>&nbsp;&nbsp;а) складываются все цифры двоичной записи, и остаток от деления суммы на 2 дописывается в конец;<br>&nbsp;&nbsp;б) над этой записью производятся те же действия.<br><b>Найдите минимальное число R, которое превышает 75.</b>',
+          answer: '78' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N чётное — к этой записи <b>слева</b> дописывается <b>10</b>;<br>&nbsp;&nbsp;б) если N нечётное — к записи <b>слева</b> дописывается <b>1</b>, а <b>справа</b> — <b>01</b>.<br><b>Укажите минимальное число R, которое может быть результатом работы этого алгоритма, при условии, что N больше, чем 18.</b>',
+          answer: '84' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если сумма цифр в двоичной записи <b>чётная</b>, то справа дописывается 0, а затем <b>два левых разряда заменяются на 10</b>;<br>&nbsp;&nbsp;б) если сумма цифр <b>нечётная</b>, то справа дописывается 1, а затем <b>два левых разряда заменяются на 11</b>.<br>Например: 6 = 110₂ → 1000₂ = 8; 4 = 100₂ → 1101₂ = 13.<br><b>Укажите минимальное число N, после обработки которого получается число R, не меньшее 16.</b>',
+          answer: '8' }
+    ],
+    2: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. К этой записи дописываются справа ещё два разряда:<br>&nbsp;&nbsp;а) складываются все цифры двоичной записи, остаток от деления суммы на 2 дописывается справа;<br>&nbsp;&nbsp;б) над этой записью производятся те же действия.<br><b>Найдите минимальное число R, которое превышает 123.</b>',
+          answer: '126' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то к этой записи дописываются <b>её три последние двоичные цифры</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то остаток от деления умножается на 3, переводится в двоичную систему счисления и дописывается в конец числа.<br>Например: 12 = 1100₂ → 1100100₂ = 100; 4 = 100₂ → 10011₂ = 19.<br><b>Укажите минимальное число N, после обработки которого получается число R, не меньшее 200.</b>',
+          answer: '26' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если число <b>чётное</b>, то к двоичной записи числа <b>слева</b> дописывается <b>10</b>;<br>&nbsp;&nbsp;б) если число <b>нечётное</b>, то <b>слева</b> дописывается <b>1</b> и <b>справа</b> — <b>01</b>.<br>Например: 4 = 100₂ → 10100₂ = 20; 5 = 101₂ → 110101₂ = 53.<br><b>Укажите минимальное число R, которое может быть результатом работы данного алгоритма, при условии, что N не меньше 17.</b>',
+          answer: '82' }
+    ],
+    3: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее дважды: складываются все цифры двоичной записи, и остаток от деления суммы на 2 дописывается в конец числа (справа).<br>Например: 12 = 1100₂ → 110000₂ = 48; 7 = 111₂ → 11110₂ = 30.<br><b>Укажите такое наименьшее число N, для которого результат работы алгоритма больше числа 85.</b>',
+          answer: '21' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится троичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то к этой записи дописываются <b>две последние троичные цифры</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то вычисляется сумма цифр троичной записи, эта сумма переводится в троичную систему счисления и дописывается в конец числа.<br>Например: 11 = 102₃ → 10210₃ = 102; 12 = 110₃ → 11010₃ = 111.<br><b>Укажите минимальное чётное число R, большее 220, которое может быть получено.</b>',
+          answer: '222' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N <b>чётное</b>, то к этой записи <b>справа и слева</b> дописываются по <b>две единицы</b>;<br>&nbsp;&nbsp;б) если N <b>нечётное</b>, то <b>в конец</b> (справа) дописываются <b>два нуля</b>, а <b>в начало</b> (слева) — <b>единица</b>.<br>Например: 13 = 1101₂ → 11110100₂; 6 = 110₂ → 1111011₂ = 123.<br><b>Укажите наибольшее число R, не превышающее 113, которое может быть результатом работы данного алгоритма.</b>',
+          answer: '108' }
+    ],
+    4: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N <b>чётное</b>, то к этой записи <b>слева</b> дописывается <b>10</b>;<br>&nbsp;&nbsp;б) если N <b>нечётное</b>, то <b>слева</b> дописывается <b>1</b>, а <b>справа</b> — <b>01</b>.<br>Например: 4 = 100₂ → 10100₂ = 20; 5 = 101₂ → 110101₂ = 53.<br><b>Укажите максимальное число R, которое может быть результатом работы алгоритма при условии, что N не больше 12.</b>',
+          answer: '109' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится троичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то к этой записи дописываются <b>две последние троичные цифры</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то остаток от деления умножается на 3, переводится в троичную систему и дописывается в конец числа.<br>Например: 6 = 20₃ → 2020₃ = 60; 4 = 11₃ → 1110₃ = 39.<br><b>Укажите максимальное число N, после обработки которого получается число, не превышающее 150.</b>',
+          answer: '16' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная запись</b> числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) вычисляется произведение P <b>ненулевых</b> цифр этой записи;<br>&nbsp;&nbsp;б) вычисляется разность S <b>наибольшей и наименьшей</b> цифр этой записи;<br>&nbsp;&nbsp;в) значения P и S записываются в троичной системе счисления <b>в порядке неубывания</b>.<br>Например: 35 = 1022₃ → P = 1·2·2 = 4 = 11₃; S = 2-0 = 2 = 2₃ → 211₃ = 22.<br><b>Укажите наименьшее число N, при обработке которого результатом будет число 113.</b>',
+          answer: '485' }
+    ],
+    5: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее дважды применяется правило: складываются все цифры двоичной записи, остаток от деления суммы на 2 дописывается в конец числа (справа).<br>Например: 12 = 1100₂ → 110000₂ = 48.<br><b>Укажите такое наименьшее число N, для которого результат работы алгоритма больше числа 253.</b>',
+          answer: '64' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то к записи <b>справа</b> дописываются цифры <b>21</b>, а <b>слева</b> — цифра <b>1</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то остаток от деления на 3 умножается на 5, переводится в троичную систему счисления и дописывается в конец числа.<br>Например: 11 = 102₃ → 102101₃ = 307; 12 = 110₃ → 111021₃ = 358.<br><b>Укажите максимальное нечётное число N, после обработки которого получается число R, не превышающее 1130.</b>',
+          answer: '121' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то <b>слева</b> к нему приписывается <b>«1»</b>, а <b>справа «02»</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то остаток от деления на 3 умножается на 5, переводится в троичную запись и дописывается в конец числа.<br>Например: 11 = 102₃ → 102101₃ = 307; 12 = 110₃ → 111002₃ = 353.<br><b>Укажите минимальное число N, после обработки которого получается число R, не меньшее 177.</b>',
+          answer: '8' }
+    ],
+    6: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если сумма цифр двоичной записи <b>чётная</b>, то <b>справа</b> дописывается <b>0</b>, а <b>два левых</b> разряда заменяются на <b>10</b>;<br>&nbsp;&nbsp;б) если сумма цифр <b>нечётная</b>, то <b>справа</b> дописывается <b>1</b>, а <b>два левых</b> разряда заменяются на <b>11</b>.<br>Например: 6 = 110₂ → 1000₂ = 8; 4 = 100₂ → 1101₂ = 13.<br><b>Укажите максимальное число N, после обработки которого получается число R, меньшее 35.</b>',
+          answer: '24' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если сумма цифр в двоичной записи <b>чётная</b>, то <b>справа</b> дописывается <b>0</b>, а <b>два левых разряда</b> заменяются на <b>10</b>;<br>&nbsp;&nbsp;б) если сумма <b>нечётная</b>, то <b>справа</b> дописывается <b>1</b>, а <b>два левых разряда</b> заменяются на <b>11</b>.<br><b>Укажите минимальное число N, после обработки которого получается число R, большее 480.</b>',
+          answer: '176' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>семеричная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) вычисляется произведение P <b>ненулевых</b> цифр этой записи;<br>&nbsp;&nbsp;б) вычисляется сумма S <b>наибольшей и наименьшей</b> цифр;<br>&nbsp;&nbsp;в) значения P и S записываются в семеричной системе в <b>порядке неубывания</b>.<br>Например: 123 = 234₇ → P = 2·3·4 = 24 = 33₇; S = 2+4 = 6 = 6₇ → 633₇ = 318.<br><b>Укажите наименьшее число N, при обработке которого результатом будет число 2725.</b>',
+          answer: '3625' }
+    ],
+    7: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если сумма цифр двоичной записи <b>чётная</b>, то <b>справа</b> дописывается <b>0</b>, а <b>два левых</b> разряда заменяются на <b>10</b>;<br>&nbsp;&nbsp;б) если сумма <b>нечётная</b>, то <b>справа</b> дописывается <b>1</b>, а <b>два левых</b> разряда заменяются на <b>11</b>.<br><b>Укажите минимальное число N, после обработки которого получается число R, большее 50.</b>',
+          answer: '19' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то <b>справа</b> дописываются цифры <b>02</b>, а <b>слева</b> — <b>1</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то остаток от деления на 3 умножается на 4, переводится в троичную запись и дописывается в конец числа.<br>Например: 11 = 102₃ → 10222₃ = 107; 12 = 110₃ → 111002₃ = 353.<br><b>Укажите максимальное нечётное число N, после обработки которого получается число R, не превышающее 1500.</b>',
+          answer: '163' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то к этой записи <b>справа</b> дописываются <b>две последние троичные цифры</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то вычисляется сумма цифр полученной троичной записи, эта сумма умножается на 2, переводится в троичную систему и дописывается в конец числа.<br>Например: 8 = 22₃ → 2222₃ = 80; 9 = 100₃ → 10000₃ = 81.<br><b>Укажите минимальное нечётное число R, большее 520, которое может быть получено.</b>',
+          answer: '567' }
+    ],
+    8: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. К этой записи <b>дописываются справа ещё два разряда</b>:<br>&nbsp;&nbsp;а) складываются все цифры двоичной записи, и остаток от деления суммы на 2 дописывается в конец (справа);<br>&nbsp;&nbsp;б) над этой записью производятся те же действия.<br><b>Укажите такое наименьшее число N, для которого результат работы данного алгоритма больше числа 89.</b>',
+          answer: '22' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N не делится на 3, то <b>справа</b> дописываются <b>три её последние цифры</b>, а <b>слева</b> — цифра <b>1</b>;<br>&nbsp;&nbsp;б) если N делится на 3, то сумма цифр троичной записи умножается на 8, переводится в троичную систему и дописывается в конец числа.<br>Например: 11 = 102₃ → 1102102₃ = 1037; 12 = 110₃ → 110121₃ = 340.<br><b>Укажите число R, ближайшее к числу 1220, которое может быть получено в результате работы алгоритма.</b>',
+          answer: '1205' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N, не превышающее 10000. Алгоритм строит новое число R:<br>1. Строится <b>девятеричная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) вычисляется произведение P <b>ненулевых</b> цифр этой записи;<br>&nbsp;&nbsp;б) вычисляется сумма S цифр этой записи;<br>&nbsp;&nbsp;в) значения P и S записываются в девятеричной системе счисления <b>в порядке неубывания</b>.<br>Например: 123 = 146₉ → P = 1·4·6 = 24 = 26₉; S = 1+4+6 = 11 = 12₉ → 1226₉ = 915.<br><b>Укажите наибольшее число N, при обработке которого результатом будет число 12537.</b>',
+          answer: '9969' }
+    ],
+    9: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. Складываются все цифры полученной двоичной записи. Если сумма получилась <b>нечётной</b>, <b>справа</b> к двоичной записи дописываются <b>две единицы</b>, иначе <b>две единицы</b> дописываются <b>слева</b>.<br>Например: 13 = 1101₂ → сумма 3 (нечётная) → 110111₂ = 55.<br><b>Найдите наименьшее число N, для которого результат работы автомата больше, чем 102.</b>',
+          answer: '17' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N делится на 3, то к этой записи <b>справа</b> дописываются <b>две последние троичные цифры</b>;<br>&nbsp;&nbsp;б) если N на 3 не делится, то вычисляется сумма цифр полученной троичной записи, эта сумма умножается на 3, переводится в троичную систему и дописывается в конец числа.<br>Например: 8 = 22₃ → 22110₃ = 228; 9 = 100₃ → 10000₃ = 81.<br><b>Укажите минимальное нечётное число R, большее 208, которое может быть получено.</b>',
+          answer: '243' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N, не превышающее 10000. Алгоритм строит новое число R:<br>1. Строится <b>восьмеричная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) вычисляется произведение P <b>ненулевых</b> цифр этой записи;<br>&nbsp;&nbsp;б) вычисляется сумма S цифр этой записи;<br>&nbsp;&nbsp;в) значения P и S записываются в восьмеричной системе счисления <b>в порядке неубывания</b>.<br>Например: 123 = 173₈ → P = 1·7·3 = 21 = 25₈; S = 1+7+3 = 11 = 13₈ → 1325₈ = 725.<br><b>Укажите наибольшее число N, при обработке которого результатом будет число 86688.</b>',
+          answer: '9716' }
+    ],
+    10: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. К этой записи <b>дописываются справа ещё два разряда</b>:<br>&nbsp;&nbsp;а) складываются все цифры двоичной записи, остаток от деления суммы на 2 дописывается в конец (справа);<br>&nbsp;&nbsp;б) над этой записью производятся те же действия.<br><b>Укажите такое наибольшее число N, для которого результат работы данного алгоритма будет меньше 86.</b>',
+          answer: '20' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N <b>кратно 3</b>, то к этой записи <b>справа</b> дописываются <b>две её последние цифры</b>;<br>&nbsp;&nbsp;б) если N <b>не кратно 3</b>, то остаток от деления на 3 сначала уменьшается на единицу, полученное число умножается на 3, а затем результат переводится в троичную запись и дописывается в конец числа.<br>Например: 12 = 110₃ → 11010₃ = 110; 11 = 102₃ → 10210₃ = 102.<br><b>Укажите максимальное число R, не превышающее 200, которое получается с помощью описанного алгоритма.</b>',
+          answer: '192' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если N <b>кратно 3</b>, то к этой записи <b>справа</b> дописываются <b>две её последние цифры</b>;<br>&nbsp;&nbsp;б) если N <b>не кратно 3</b>, то остаток от деления на 3 уменьшается на единицу, умножается на 3 и результат переводится в троичную запись и дописывается в конец.<br><b>Укажите максимальное число N, при обработке которого получается число R, не превышающее 200.</b>',
+          answer: '22' }
+    ],
+    11: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. К этой записи <b>дописываются разряды</b> по следующему правилу: если <b>два последних разряда одинаковые</b>, дописывается <b>0</b>, иначе дописывается <b>1</b>.<br>3. Пункт 2 выполняется <b>повторно</b>.<br><b>Укажите минимальное число N, при вводе которого получится значение R больше, чем 93.</b>',
+          answer: '24' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если сумма цифр троичной записи числа <b>кратна 9</b>, то к этой записи <b>справа</b> дописывается цифра <b>2</b>;<br>&nbsp;&nbsp;б) если сумма цифр <b>не кратна 9</b>, то <b>справа</b> дописывается троичная запись остатка от деления суммы цифр записи на 9.<br>Например: 9 = 100₃ → 1001₃ = 28; 161 = 12222₃ → 122222₃ = 485.<br><b>Укажите минимальное число R, которое может быть результатом работы данного алгоритма, при условии, что N больше 166.</b>',
+          answer: '647' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>восьмеричная</b> запись числа N.<br>2. Далее:<br>&nbsp;&nbsp;а) если восьмеричная запись <b>начинается на 5</b>, то все двойки в записи меняются на единицы, а все единицы меняются на двойки, а затем к числу <b>слева</b> приписывается <b>11</b>;<br>&nbsp;&nbsp;б) если восьмеричная запись <b>начинается не на 5</b>, то к записи <b>справа</b> приписывается <b>10</b>, а затем старший и младший разряды полученной записи меняются на 2 и 0 соответственно.<br><b>Укажите максимальное число N, для которого результатом работы алгоритма является наибольшее число R, меньшее 1354.</b>',
+          answer: '61' }
+    ],
+    12: [
+        { level: 3, title: 'Задача 1',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится двоичная запись числа N.<br>2. К полученной записи дописываются разряды. Если в числе <b>чётное количество единиц</b>, слева дописывается <b>1</b>, справа — <b>два нуля</b>; если <b>нечётное</b> — слева дописываются <b>две единицы</b>.<br>Например: 13 = 1101₂ (3 единицы — нечётное) → 111101₂ = 61.<br><b>В результате работы автомата на экране появилось число, не меньшее 412. Для какого наименьшего значения N данная ситуация возможна?</b>',
+          answer: '39' },
+        { level: 4, title: 'Задача 2',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится <b>троичная</b> запись числа N.<br>2. К этой записи <b>дописываются справа ещё несколько разрядов</b>:<br>&nbsp;&nbsp;а) если N <b>чётное</b>, то к нему <b>справа</b> приписываются <b>два нуля</b>, а <b>слева единица</b>;<br>&nbsp;&nbsp;б) если N <b>нечётное</b>, то к нему <b>справа</b> приписывается в троичном виде <b>сумма цифр его троичной записи</b>.<br>Например: 4 = 11₃ → 11100₃ = 117; 7 = 21₃ → 2110₃ = 66.<br><b>Укажите такое наименьшее число N, для которого число R больше числа 168.</b>',
+          answer: '10' },
+        { level: 5, title: 'Задача 3',
+          description: 'На вход алгоритма подаётся натуральное число N. Алгоритм строит новое число R:<br>1. Строится запись числа N в <b>четверичной</b> системе счисления (с основанием 4).<br>2. Далее:<br>&nbsp;&nbsp;а) если число N <b>делится на 4</b>, то к этой записи дописываются <b>две последние цифры</b> четверичной записи;<br>&nbsp;&nbsp;б) если число N на 4 <b>не делится</b>, то остаток от его деления на 4 умножается на 5, переводится в четверичную систему и дописывается в конец числа.<br>Например: 17 = 101₄ → 10111₄ = 277; 24 = 120₄ → 12020₄ = 392.<br><b>Укажите максимальное число N, после обработки которого с помощью этого алгоритма получается число R, меньшее 555.</b>',
+          answer: '34' }
+    ]
+};
+
+// ============================================
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+// ============================================
+let pyodide = null;
+let currentUser = null;
+let currentVariant = null;
+let currentTasks = [];
+let userAnswers = {};
+let switchCount = 0;
+let startTime = null;
+let isWorkActive = false;
+let usedVariants = new Set();
+let timerInterval = null;
+const editors = {};   // CodeMirror-инстансы по индексу задачи
+
+// ============================================
+// ЗАГРУЗКА PYODIDE
+// ============================================
+async function initPyodide() {
+    try {
+        pyodide = await loadPyodide();
+        document.getElementById('loadingOverlay').classList.add('hidden');
+    } catch (error) {
+        document.getElementById('loadingOverlay').innerHTML =
+            '<p style="color: var(--danger); font-size: 1.2rem;">❌ Ошибка загрузки интерпретатора</p>' +
+            '<p style="color: var(--gray); margin-top: 10px;">Проверьте подключение к интернету и обновите страницу</p>';
+    }
+}
+
+// ============================================
+// РЕГИСТРАЦИЯ И ВЫБОР ВАРИАНТА
+// ============================================
+function registerStudent() {
+    const fullName = document.getElementById('studentFullName').value.trim();
+    const studentClass = document.getElementById('studentClass').value.trim();
+    if (!fullName || fullName.split(' ').length < 2) {
+        alert('Введите ФИО полностью (минимум фамилию и имя)');
+        return;
+    }
+    if (!studentClass) { alert('Введите класс'); return; }
+    currentUser = { fullName, studentClass };
+    document.getElementById('step-registration').classList.add('hidden');
+    document.getElementById('step-select-variant').classList.remove('hidden');
+    renderVariantsGrid();
+}
+
+function renderVariantsGrid() {
+    const grid = document.getElementById('variantsGrid');
+    grid.innerHTML = '';
+    for (let i = 1; i <= 12; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'variant-btn';
+        btn.textContent = i;
+        btn.onclick = () => selectVariant(i, btn);
+        grid.appendChild(btn);
+    }
+}
+
+function selectVariant(num, btn) {
+    currentVariant = num;
+    document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('startBtn').disabled = false;
+}
+
+// ============================================
+// НАЧАЛО РАБОТЫ
+// ============================================
+function startWork() {
+    if (!currentVariant) { alert('Выберите вариант'); return; }
+    usedVariants.clear();
+    switchCount = 0;
+    userAnswers = {};
+    document.getElementById('step-select-variant').classList.add('hidden');
+    document.getElementById('step-solving').classList.remove('hidden');
+    document.getElementById('workTitle').textContent = `Вариант ${currentVariant}`;
+    loadCurrentVariant();
+    setupTabSwitchDetection();
+    startTime = Date.now();
+    startTimer();
+    isWorkActive = true;
+}
+
+function loadCurrentVariant() {
+    currentTasks = VARIANTS[currentVariant];
+    usedVariants.add(currentVariant);
+    userAnswers = {};
+    renderTasks();
+    updateProgress();
+}
+
+function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    const timerElement = document.getElementById('timerText');
+    const updateTimer = () => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        timerElement.textContent = `⏱ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+// ============================================
+// ИНИЦИАЛИЗАЦИЯ РЕДАКТОРА CodeMirror
+// ============================================
+function initEditor(index) {
+    const holder = document.getElementById(`editor-${index}`);
+    holder.innerHTML = '';
+    const editor = CodeMirror(holder, {
+        value: '',                 // редактор ПУСТОЙ
+        mode: 'python',
+        theme: 'lms-dark',
+        lineNumbers: true,
+        indentUnit: 4,
+        tabSize: 4,
+        indentWithTabs: false,
+        smartIndent: true,         // умный автоотступ при Enter
+        autoCloseBrackets: true,   // автозакрытие скобок
+        matchBrackets: true,       // подсветка парных скобок
+        lineWrapping: true,
+        styleActiveLine: true,
+        viewportMargin: Infinity
+    });
+
+    // Мягкое PEP8-форматирование ТОЛЬКО при потере фокуса.
+    // Отступы НЕ трогаем — их пользователь контролирует сам (Tab/Shift+Tab).
+    editor.on('blur', () => {
+        setTimeout(() => softFormatPEP8(editor), 200);
+    });
+
+    editors[index] = editor;
+}
+
+// Мягкое форматирование: только пробелы (безопасно, не ломает структуру)
+function softFormatPEP8(editor) {
+    const code = editor.getValue();
+    if (!code.trim()) return;
+
+    const lines = code.split('\n');
+    const formatted = lines.map(line => {
+        // Сохраняем ведущий отступ пользователя без изменений
+        const indentMatch = line.match(/^(\s*)/);
+        const indent = indentMatch ? indentMatch[1] : '';
+        let content = line.slice(indent.length);
+
+        // 1. Удаляем пробелы в конце строки (PEP8)
+        content = content.replace(/\s+$/, '');
+
+        // 2. Не трогаем комментарии и строки целиком
+        const trimmed = content.trim();
+        if (trimmed.startsWith('#')) return indent + content;
+
+        // 3. Пробел после запятой (только вне строк — грубая, но безопасная замена)
+        if (!trimmed.includes('"') && !trimmed.includes("'")) {
+            content = content.replace(/,(\S)/g, ', $1');
+            // 4. Пробел вокруг операторов сравнения и присваивания
+            content = content
+                .replace(/\s*==\s*/g, ' == ')
+                .replace(/\s*!=\s*/g, ' != ')
+                .replace(/\s*<=\s*/g, ' <= ')
+                .replace(/\s*>=\s*/g, ' >= ');
+            // убираем дубли пробелов, которые могли появиться
+            content = content.replace(/ {2,}/g, ' ').replace(/\s+$/, '');
+        }
+
+        return indent + content;
+    });
+
+    const result = formatted.join('\n');
+    if (result !== code) {
+        const cursor = editor.getCursor();
+        const scroll = editor.getScrollInfo();
+        editor.setValue(result);
+        editor.setCursor(cursor);
+        editor.scrollTo(scroll.left, scroll.top);
+    }
+}
+
+// ============================================
+// ОТРИСОВКА ЗАДАЧ
+// ============================================
+function renderTasks() {
+    const container = document.getElementById('tasksContainer');
+    container.innerHTML = currentTasks.map((task, index) => `
+        <div class="task-card" id="task-${index}">
+            <div class="task-header">
+                <div class="task-title">${task.title}</div>
+                <div>
+                    <span class="badge badge-level-${task.level}">Уровень ${task.level}</span>
+                    <span class="task-status status-pending" id="status-${index}">Ожидает ответа</span>
+                </div>
+            </div>
+            <div class="task-description">${task.description}</div>
+            <div class="editor-wrapper">
+                <div id="editor-${index}"></div>
+            </div>
+            <div class="task-actions">
+                <button class="btn btn-success" onclick="checkTask(${index})">▶ Проверить программу</button>
+            </div>
+            <div id="feedback-${index}"></div>
+        </div>
+    `).join('');
+
+    // Инициализируем CodeMirror для каждой задачи (пустые редакторы)
+    currentTasks.forEach((_, index) => initEditor(index));
+}
+
+// ============================================
+// ПРОВЕРКА ПРОГРАММЫ ЧЕРЕЗ PYODIDE
+// ============================================
+async function checkTask(index) {
+    const task = currentTasks[index];
+    const editor = editors[index];
+    const code = editor ? editor.getValue() : '';
+    const feedback = document.getElementById(`feedback-${index}`);
+    const statusEl = document.getElementById(`status-${index}`);
+    const cardEl = document.getElementById(`task-${index}`);
+
+    if (!code.trim()) {
+        feedback.innerHTML = '<div class="output error">❌ Напишите решение задачи</div>';
+        return;
+    }
+
+    feedback.innerHTML = '<div class="output info">⏳ Выполнение программы...</div>';
+
+    try {
+        const result = await runPythonCode(code);
+
+        if (result.error) {
+            feedback.innerHTML = `<div class="output error">❌ Ошибка в программе:<br>${escapeHtml(result.error)}</div>`;
+            statusEl.textContent = 'Ошибка';
+            statusEl.className = 'task-status status-wrong';
+            cardEl.classList.add('wrong');
+            cardEl.classList.remove('completed');
+            userAnswers[index] = { output: '', correct: false, error: result.error };
+            updateProgress();
+            return;
+        }
+
+        const studentOutput = result.output.trim();
+        const expectedOutput = String(task.answer).trim();
+        const isCorrect = studentOutput === expectedOutput;
+
+        let html = '';
+        if (isCorrect) {
+            // ✅ При ВЕРНОМ решении показываем правильный ответ
+            html = `<div class="output success">✅ <b>Верно!</b><br><br>Вывод программы: <code>${escapeHtml(studentOutput) || '(пусто)'}</code><br>Правильный ответ: <code>${escapeHtml(expectedOutput)}</code></div>`;
+            statusEl.textContent = 'Решено';
+            statusEl.className = 'task-status status-completed';
+            cardEl.classList.add('completed');
+            cardEl.classList.remove('wrong');
+        } else {
+            // ❌ При НЕВЕРНОМ решении правильный ответ НЕ показываем
+            html = `<div class="output error">❌ <b>Неверно.</b><br><br>Вывод вашей программы: <code>${escapeHtml(studentOutput) || '(пусто)'}</code><br><br>Проверьте алгоритм и попробуйте снова.</div>`;
+            statusEl.textContent = 'Неверно';
+            statusEl.className = 'task-status status-wrong';
+            cardEl.classList.add('wrong');
+            cardEl.classList.remove('completed');
+        }
+        feedback.innerHTML = html;
+        userAnswers[index] = { output: studentOutput, correct: isCorrect };
+
+        updateProgress();
+
+        const solved = Object.values(userAnswers).filter(a => a.correct).length;
+        if (solved === currentTasks.length) {
+            setTimeout(() => {
+                if (confirm('🎉 Все задачи решены! Завершить работу и отправить результаты?')) {
+                    showResults();
+                }
+            }, 500);
+        }
+    } catch (error) {
+        feedback.innerHTML = `<div class="output error">❌ Ошибка: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function escapeHtml(str) {
+    if (str === undefined || str === null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+async function runPythonCode(code) {
+    try {
+        await pyodide.runPythonAsync(`
+import sys
+from io import StringIO
+import __main__
+
+for _name in list(__main__.__dict__.keys()):
+    if not _name.startswith('__') and _name not in ('sys', 'StringIO', '__main__'):
+        try:
+            del __main__.__dict__[_name]
+        except:
+            pass
+
+_output_capture = StringIO()
+sys.stdout = _output_capture
+`);
+
+        let errorMessage = null;
+        try {
+            await pyodide.runPythonAsync(code);
+        } catch (e) {
+            errorMessage = String(e.message || e).split('\n').pop();
+        }
+
+        const output = await pyodide.runPythonAsync(`
+sys.stdout = sys.__stdout__
+_output_capture.getvalue()
+`);
+        return { output: output, error: errorMessage };
+    } catch (e) {
+        return { output: '', error: String(e) };
+    }
+}
+
+function updateProgress() {
+    const solved = Object.values(userAnswers).filter(a => a.correct).length;
+    const total = currentTasks.length;
+    document.getElementById('progressText').textContent = `${solved} / ${total} решено`;
+    document.getElementById('stickyProgress').textContent = `${solved} решено / ${total} задач`;
+}
+
+// ============================================
+// ЗАЩИТА ОТ СПИСЫВАНИЯ
+// ============================================
+function setupTabSwitchDetection() {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
+}
+
+function handleVisibilityChange() {
+    if (document.hidden && isWorkActive) replaceVariant();
+}
+
+function handleWindowBlur() {
+    if (isWorkActive) replaceVariant();
+}
+
+function replaceVariant() {
+    switchCount++;
+    document.getElementById('switchCounter').textContent = `Замен вариантов: ${switchCount}`;
+    document.getElementById('stickySwitches').textContent = switchCount;
+    showToast('⚠️ Переключение вкладки — назначен новый вариант!', 'warning');
+
+    document.querySelectorAll('.task-card').forEach(c => c.classList.add('replacing'));
+
+    setTimeout(() => {
+        let available = [];
+        for (let i = 1; i <= 12; i++) {
+            if (!usedVariants.has(i) && i !== currentVariant) available.push(i);
+        }
+        if (available.length === 0) {
+            usedVariants.clear();
+            available = [];
+            for (let i = 1; i <= 12; i++) if (i !== currentVariant) available.push(i);
+        }
+        const newVariant = available[Math.floor(Math.random() * available.length)];
+        currentVariant = newVariant;
+        document.getElementById('workTitle').textContent = `Вариант ${currentVariant}`;
+        loadCurrentVariant();
+        showToast(`🔄 Теперь вы решаете вариант ${currentVariant}`, 'info');
+    }, 500);
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+
+// ============================================
+// КРИТЕРИИ ОЦЕНИВАНИЯ
+// ============================================
+function calculateGrade() {
+    const solved = Object.values(userAnswers).filter(a => a.correct).length;
+    if (solved === 3) return 5;
+    if (solved === 2) return 4;
+    if (solved === 1) return 3;
+    return 2;
+}
+
+function showResults() {
+    isWorkActive = false;
+    if (timerInterval) clearInterval(timerInterval);
+
+    const solved = Object.values(userAnswers).filter(a => a.correct).length;
+    const total = currentTasks.length;
+    const grade = calculateGrade();
+    const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+    document.getElementById('step-solving').classList.add('hidden');
+    document.getElementById('step-results').classList.remove('hidden');
+
+    const gradeDisplay = document.getElementById('finalGradeDisplay');
+    gradeDisplay.textContent = grade;
+    gradeDisplay.className = `final-grade grade-${grade}`;
+
+    let summaryHtml = `
+        <tr><td>Ученик</td><td>${escapeHtml(currentUser.fullName)}</td></tr>
+        <tr><td>Класс</td><td>${escapeHtml(currentUser.studentClass)}</td></tr>
+        <tr><td>Вариант</td><td>${currentVariant}</td></tr>
+        <tr><td>Решено правильно</td><td>${solved} из ${total}</td></tr>
+        <tr><td>Оценка</td><td style="color: var(--warning); font-size: 1.3rem;">«${grade}»</td></tr>
+        <tr><td>Переключений вкладок</td><td>${switchCount}</td></tr>
+        <tr><td>Время работы</td><td>${Math.floor(timeSpent / 60)} мин ${timeSpent % 60} сек</td></tr>
+    `;
+    currentTasks.forEach((task, i) => {
+        const ans = userAnswers[i];
+        if (ans) {
+            const shortOutput = (ans.output || '(пусто)').substring(0, 30);
+            summaryHtml += `<tr><td>${task.title}</td><td>${ans.correct ? '✅ Вывод: ' + escapeHtml(shortOutput) : '❌ Не решено'}</td></tr>`;
+        } else {
+            summaryHtml += `<tr><td>${task.title}</td><td>— без ответа</td></tr>`;
+        }
+    });
+    document.getElementById('resultsSummary').innerHTML = summaryHtml;
+}
+
+// ============================================
+// ГЕНЕРАЦИЯ ОТЧЁТА
+// ============================================
+function generateReport() {
+    const solved = Object.values(userAnswers).filter(a => a.correct).length;
+    const total = currentTasks.length;
+    const grade = calculateGrade();
+    const timeSpent = Math.round((Date.now() - startTime) / 1000);
+
+    let report = `ТЕМА: ${TOPIC}\n`;
+    report += `${'='.repeat(45)}\n\n`;
+    report += `Ученик: ${currentUser.fullName}\n`;
+    report += `Класс: ${currentUser.studentClass}\n`;
+    report += `Вариант: ${currentVariant}\n`;
+    report += `Решено: ${solved} из ${total}\n`;
+    report += `Оценка: ${grade}\n`;
+    report += `Переключений вкладок: ${switchCount}\n`;
+    report += `Время: ${Math.floor(timeSpent / 60)} мин ${timeSpent % 60} сек\n`;
+    report += `Дата: ${new Date().toLocaleString('ru-RU')}\n\n`;
+    report += `ДЕТАЛИ ПО ЗАДАЧАМ:\n${'-'.repeat(45)}\n`;
+    currentTasks.forEach((task, i) => {
+        const ans = userAnswers[i];
+        if (ans) {
+            report += `${i + 1}. ${task.title}\n`;
+            report += `   Вывод программы: ${ans.output || '(пусто)'}\n`;
+            report += `   ${ans.correct ? '✅ ВЕРНО' : '❌ НЕВЕРНО'}\n\n`;
+        } else {
+            report += `${i + 1}. ${task.title}\n   Без ответа\n\n`;
+        }
+    });
+    return report;
+}
+
+// ============================================
+// ОТПРАВКА В GOOGLE SHEETS
+// ============================================
+async function sendToTeacher() {
+    if (!currentUser) { showToast('❌ Сначала зарегистрируйтесь', 'warning'); return; }
+    if (!WEBAPP_URL || WEBAPP_URL.includes('ВСТАВЬТЕ_СЮДА')) {
+        showToast('❌ Не настроен URL Google Apps Script! Обратитесь к учителю.', 'error');
+        return;
+    }
+
+    const btn1 = document.getElementById('sendBtn');
+    const btn2 = document.getElementById('sendBtn2');
+    if (btn1) { btn1.disabled = true; btn1.textContent = '⏳ Отправка...'; }
+    if (btn2) { btn2.disabled = true; btn2.textContent = '⏳ Отправка...'; }
+
+    showToast('⏳ Сохранение результатов в таблицу...', 'info');
+
+    const solved = Object.values(userAnswers).filter(a => a.correct).length;
+    const total = currentTasks.length;
+    const grade = calculateGrade();
+
+    const payload = {
+        topic: TOPIC,
+        fullName: currentUser.fullName,
+        studentClass: currentUser.studentClass,
+        variant: currentVariant,
+        targetGrade: `${solved} из ${total}`,
+        solved: `${solved} из ${total}`,
+        finalGrade: grade,
+        switchCount: switchCount,
+        report: generateReport()
+    };
+
+    try {
+        await fetch(WEBAPP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+        });
+        showToast('✅ Результаты записаны в таблицу!', 'success');
+        if (btn1) { btn1.disabled = false; btn1.textContent = '✅ Отправлено!'; }
+        if (btn2) { btn2.disabled = false; btn2.textContent = '✅ Отправлено!'; }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showToast('❌ Ошибка отправки. Отчёт скопирован в буфер.', 'error');
+        navigator.clipboard.writeText(generateReport()).catch(() => {});
+        if (btn1) { btn1.disabled = false; btn1.textContent = '✅ Завершить и отправить'; }
+        if (btn2) { btn2.disabled = false; btn2.textContent = '✅ Завершить и отправить'; }
+    }
+}
+
+function downloadResults() {
+    const blob = new Blob([generateReport()], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ЕГЭ_Тип5_${currentUser.fullName.split(' ')[0]}_вар${currentVariant}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Запуск
+initPyodide();
+</script>
+</body>
+</html>
